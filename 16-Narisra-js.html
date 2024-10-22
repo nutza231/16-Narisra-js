@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF0F5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #FFE4E1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 1080px;
+            margin: auto;
+        }
+        h1, h2 {
+            color: #D2691E;
+        }
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .nav label {
+            display: inline-block;
+            margin-right: 5px;
+            line-height: 32px;
+        }
+        .nav input {
+            flex: 2;
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #FFB6C1;
+            border-radius: 5px;
+            height: 32px;
+        }
+        .nav button {
+            flex: 1;
+            margin-left: 10px;
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button {
+            flex: 1;
+            margin-left: 10px;
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+
+        }
+        .nav button:hover {
+            background-color: #FF1493;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .summary {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .delete {
+            background-color: #FF6347;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete:hover {
+            background-color: #FF4500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Shopping Cart</h1>
+        <h2 class="topic">Add Item for selection</h2>
+        <div class="nav">
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" placeholder=" " />
+            <label for="productPrice">Price:</label>
+            <input type="number" id="productPrice" placeholder=" " />
+            <label for="productImage">Image:</label>
+            <input type="url" id="productImage" placeholder=" " />
+            <button onclick="createProduct()">Create Product</button>
+        </div>
+        <ul id="productList"></ul>
+        <button class="button" onclick="addToCart()">Add to Cart</button>
+        <ul id="cartList"></ul>
+        <button class="button"onclick="calculateTotal()">Calculate Final Price</button>
+        <p>
+            <span class="summary">You have to pay: </span>
+        </p>
+    </div>
+    <script>
+let products = [];
+let cart = [];
+
+function createProduct() {
+    let name = document.getElementById('productName').value.trim();
+    let price = parseFloat(document.getElementById('productPrice').value);
+    let image = document.getElementById('productImage').value.trim() ;
+
+    if (name && !isNaN(price) && price > 0) {
+        products.push({ name, price, image });
+        document.getElementById("productName").value = "";
+        document.getElementById("productPrice").value = "";
+        document.getElementById("productImage").value = "";
+        displayProducts();
+    } else {
+        alert("Please provide valid inputs");
+    }
+}
+
+function displayProducts() {
+    let productList = document.getElementById('productList');
+    productList.innerHTML = '';
+    products.forEach((item, index) => {
+        productList.innerHTML += `
+            <li>
+                <img src="${item.image}" alt="${item.name}" style="width: 100px; height: auto;" />
+                <span>${item.name} - ฿${item.price.toFixed(2)}</span>
+                <div>
+                    <input type="checkbox" id="product_${index}" />
+                    <label for="product_${index}">Add to Cart</label>
+                    <button class="delete" onclick="removeProduct(${index})">Remove</button>
+                </div>
+            </li>
+        `;
+    });
+}
+
+function removeProduct(index) {
+    products.splice(index, 1);
+    displayProducts();
+}
+
+function addToCart() {
+    products.forEach((item, index) => {
+        const checkbox = document.getElementById(`product_${index}`);
+        if (checkbox.checked) {
+            cart.push(item);
+        }
+    });
+    displayCart();
+}
+
+function displayCart() {
+    let cartList = document.getElementById('cartList');
+    cartList.innerHTML = '';
+    cart.forEach((item, index) => {
+        cartList.innerHTML += `
+            <li>
+                <img src="${item.image}" alt="${item.name}" style="width: 50px; height: auto; margin-right: 10px;" />
+                ${item.name} - ฿${item.price.toFixed(2)}
+                <button class="delete" onclick="removeFromCart(${index})">Remove</button>
+            </li>
+        `;
+    });
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    displayCart();
+}
+
+function calculateTotal() {
+    let total = cart.reduce((sum, item) => sum + item.price, 0);
+    document.querySelector('.summary').innerText = `You have to pay: ฿${total.toFixed(2)}`;
+}
+    </script>
+</body>
+</html>
